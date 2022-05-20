@@ -2,7 +2,7 @@ from cgitb import text
 from bs4 import BeautifulSoup
 import requests
 import pprint
-import datetime
+
 import json
 
 def getNDTVstories():
@@ -21,13 +21,13 @@ def getNDTVstories():
             image.append(img.find("a").img["src"])
 
         
-            # data1["img_url"]=img.find("a").img["src"]
+            
 
         hading=[]    
         for hdng in main.findAll("h2", class_="newsHdng"):
             if hdng != None:
                 hading.append(hdng.text.strip())
-            # data1["heading"]=hdng.text.strip()
+            
 
 
         ownr=[]
@@ -36,23 +36,20 @@ def getNDTVstories():
         # if non !=  owner in non: 
             if owner != None:   
                 ownr.append(owner.a.text.strip())
-            # data1["owner_name"]=owner.find("a").text.strip()
-        # else:
-            # pass
+            
 
         dt=[]
         non1= main.findAll("span",class_="posted-by")
         for date in non1:
             if date != None:
                 dt.append(date.text.strip())
-            # data1["date"]=date.get_text().strip()
+            
 
 
         dtl=[]
         for detail in main.findAll("p",class_="newsCont"):
             dtl.append(detail.text)
-            # data1["detail"]=detail.text
-        # print(data1)
+            
 
         for i in range(len(dtl)):
             data1={}
@@ -68,10 +65,10 @@ def getNDTVstories():
     return main_data
 
         
-x=getNDTVstories()
+# x=getNDTVstories()
 
-with open("NDTV-news.json",'w') as file:
-    json.dump(x,file,indent=2)
+# with open("NDTV-news.json",'w') as file:
+#     json.dump(x,file,indent=2)
 
 
 def LoadHistory():
@@ -84,10 +81,10 @@ def LoadHistory():
     while j<=len(new_data):
         if new_data[-j] not in old_data:
             old_data.insert(0,new_data[-j])
-    else:
-        pass
-    j+=1
-    
+        else:
+            break
+        j+=1
+        
     return old_data
 
 y= LoadHistory() 
