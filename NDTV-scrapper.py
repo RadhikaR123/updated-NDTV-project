@@ -2,7 +2,6 @@ from cgitb import text
 from bs4 import BeautifulSoup
 import requests
 import pprint
-
 import json
 
 def getNDTVstories():
@@ -59,7 +58,12 @@ def getNDTVstories():
             data1["date"]=dt[i]
             data1["details"]=dtl[i]
 
-            main_data.append(data1)
+#             main_data.append(data1)
+            
+            if data1 not in main_data:
+                main_data.append(data1
+            else:
+                break                 
 
 
     return main_data
