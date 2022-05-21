@@ -37,12 +37,29 @@ def getNDTVstories():
                 ownr.append(owner.a.text.strip())
             
 
-        dt=[]
+        dt1=[]
         non1= main.findAll("span",class_="posted-by")
         for date in non1:
             if date != None:
-                dt.append(date.text.strip())
-            
+                dt1.append(date.text.strip())
+         main_dt=[]
+         st=""
+         for dt in dt1:
+            for i in dt:
+                if i=="|":
+                    st=""
+                else:
+                    st+=i
+            c=0
+            str1=""
+            for i in st:
+                if i==",":
+                    c+=1
+                    if c==2:
+                        break
+                else:
+                    str1+=i
+            main_dt.append(str1)   
 
 
         dtl=[]
@@ -55,7 +72,7 @@ def getNDTVstories():
             data1["imageurl"]=image[i]
             data1["heading"]=hading[i]
             data1["ownername"]=ownr[i]
-            data1["date"]=dt[i]
+            data1["date"]=main_dt[i]
             data1["details"]=dtl[i]
 
 #             main_data.append(data1)
