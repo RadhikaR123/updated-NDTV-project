@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import pprint
 import json
+import os
 
 def getNDTVstories():
     main_data=[]
@@ -83,30 +84,42 @@ def getNDTVstories():
                 break                 
 
 
-    return main_data
+    with open("NDTV-news.json",'w') as file:
+        json.dump(main_data,file,indent=2)
+
+    with open("NDTV-news.json",'r') as fil:
+        newData=json.load(fil)
+
+    return newData
 
         
-# x=getNDTVstories()
-
-# with open("NDTV-news.json",'w') as file:
-#     json.dump(x,file,indent=2)
 
 
 def LoadHistory():
-    with open("NDTV-news.json",'r') as f:
-        old_data=json.load(f)
+    file = os.path.exists("NDTV-news.json")
+    if file== False:
+        new_data=getNDTVstories()
 
-    new_data=getNDTVstories()
-
-    j=1
-    while j<=len(new_data):
-        if new_data[-j] not in old_data:
-            old_data.insert(0,new_data[-j])
-        else:
-            break
-        j+=1
+        with open("NDTV-news.json",'r') as f:
+            old_data=json.load(f)
         
-    return old_data
+        return old_data
+    else:
+        with open("NDTV-news.json",'r') as f:
+            old_data=json.load(f)
+
+        new_data= getNDTVstories()
+
+        j=1
+        while j<=len(new_data):
+            if new_data[-j] not in old_data:
+                old_data.insert(0,new_data[-j])
+            else:
+                break
+            j+=1
+        
+        return old_data
+
 
 y= LoadHistory() 
 
