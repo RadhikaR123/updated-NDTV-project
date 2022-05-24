@@ -1,132 +1,105 @@
-from cgitb import text
+
 from bs4 import BeautifulSoup
 import requests
 import pprint
 import json
-import os
+
 
 def getNDTVstories():
-    main_data=[]
-
-    for r in range(1,6):
-
+    rdata=[]                             # all new stories will be stored in this list
+    r=1
+    while r<=5:
+        main_data =[]                                                        # All story of one page will be stored in this list
         url="https://www.ndtv.com/india/page-"+str(r)
         data= requests.get(url)
         soup=BeautifulSoup(data.text,'html.parser')
         main= soup.find("div",class_="lisingNews")
-        news=main.find("div",class_="news_Itm-cont")
+        news=main.findAll("div",class_="news_Itm")
 
-        image=[]
-        for img in main.findAll("div",class_="news_Itm-img"):
-            image.append(img.find("a").img["src"])
+        for j in main: 
+            data1={}                                                #the data of 1 story will be stored in this dictionary                                      
+            img=j.find("div",class_="news_Itm-img")
+            if img != None:        
+                data1["image"]=(img.find("a")["href"])
 
-        
-            
-
-        hading=[]    
-        for hdng in main.findAll("h2", class_="newsHdng"):
+         
+            hdng=j.find("h2", class_="newsHdng")
             if hdng != None:
-                hading.append(hdng.text.strip())
+                data1["hading"]=(hdng.text.strip())
             
-
-
-        ownr=[]
-        # non=main.fNone:
-        for owner in main.findAll("span",class_="posted-by"):
-        # if non !=  owner in non: 
+                
+            owner = j.find("span",class_="posted-by")
             if owner != None:   
-                ownr.append(owner.a.text.strip())
-            
+                data1["owner"] = owner.find("a").text.strip()
+            else:
+                continue    
 
-        dt1=[]
-        non1= main.findAll("span",class_="posted-by")
-        for date in non1:
+            
+            date= j.find("span",class_="posted-by")
             if date != None:
-                dt1.append(date.text.strip())
-         main_dt=[]
-         st=""
-         for dt in dt1:
-            for i in dt:
-                if i=="|":
-                    st=""
-                else:
-                    st+=i
-            c=0
-            str1=""
-            for i in st:
-                if i==",":
-                    c+=1
-                    if c==2:
-                        break
-                else:
-                    str1+=i
-            main_dt.append(str1)   
+                dt1 = date.text.strip()
+                main_dt=""
+                st=""
+                for dt in dt1:
+                    for i in dt:
+                        if i=="|":
+                            st=""
+                        else:
+                            st+=i
+                    c=0
+                    str1=""
+                    for i in st:
+                        if i==",":
+                            c+=1
+                            if c==2:
+                                break
+                        else:
+                            str1+=i
+                data1["date"]= str1 
 
 
-        dtl=[]
-        for detail in main.findAll("p",class_="newsCont"):
-            dtl.append(detail.text)
-            
 
-        for i in range(len(dtl)):
-            data1={}
-            data1["imageurl"]=image[i]
-            data1["heading"]=hading[i]
-            data1["ownername"]=ownr[i]
-            data1["date"]=main_dt[i]
-            data1["details"]=dtl[i]
+            detail = j.find("p",class_="newsCont")
+            if detail != None:
+                data1["details"] = detail.text
+                
+            main_data.append(data1)            
 
-#             main_data.append(data1)
-            
-            if data1 not in main_data:
-                main_data.append(data1
-            else:
-                break                 
-
-
-    with open("NDTV-news.json",'w') as file:
-        json.dump(main_data,file,indent=2)
-
-    with open("NDTV-news.json",'r') as fil:
-        newData=json.load(fil)
-
-    return newData
+        if main_data[0] not in rdata:      #if first story of any page is not in rdata,then it will append that page's stories in rdata
+            for i in main_data:
+                rdata.append(i)
+            r+=1                          #after appending, next page will be executed
+        else:
+            break                # otherwise if that story is already in radata then loop will be terminated
+    return rdata  
 
         
 
+def LoadHistory():    
+    with open("NDTV-news.json",'r') as f:
+        oldData=json.load(f)
 
-def LoadHistory():
-    file = os.path.exists("NDTV-news.json")
-    if file== False:
-        new_data=getNDTVstories()
-
-        with open("NDTV-news.json",'r') as f:
-            old_data=json.load(f)
-        
-        return old_data
-    else:
-        with open("NDTV-news.json",'r') as f:
-            old_data=json.load(f)
-
-        new_data= getNDTVstories()
-
-        j=1
-        while j<=len(new_data):
-            if new_data[-j] not in old_data:
-                old_data.insert(0,new_data[-j])
-            else:
-                break
-            j+=1
-        
-        return old_data
+    return oldData
 
 
-y= LoadHistory() 
+def appendData():
 
+    old_data= LoadHistory() 
 
+    new_data= getNDTVstories()
 
-with open("NDTV-news.json","a") as file:
-    json.dump(y,file,indent=2)
+    j=1
+    while j<len(new_data):
+        if new_data[-j] not in old_data:
+            old_data.insert(0,new_data[-j])
+        else:
+            break
+        j+=1
+    
+        with open("NDTV-news.json","a") as file:
+            json.dump(old_data,file,indent=2)
+
+appendData()                                          #execution of the code will be started from here..(appendData function)
 
 
 
