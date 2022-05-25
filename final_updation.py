@@ -4,7 +4,7 @@ import requests
 import pprint
 import json
 import os
-
+                                    # code will start execution from the last "appendData" function
 def getNDTVstories():
     main_data=[]
 
@@ -73,12 +73,12 @@ def getNDTVstories():
             
             main_data.append(data1)                 
    
-    return main_data
+    return main_data               #this will return all 5 page's data
 
 
 def getNewStories():
 
-    rdata = LoadHistory()
+    rdata = LoadHistory()           #will take thw returns of loadHistory function into "rdata" variable
     mainData = []
     r=1
     while r<=5:
@@ -89,16 +89,16 @@ def getNewStories():
         main= soup.find("div",class_="lisingNews")
         news=main.findAll("div",class_="news_Itm")
         index=0
-        for j in main: 
+        for j in main:                  #each "j" includes every stories all type of information.
             
-            check_heading= (j.find("h2", class_="newsHdng"))
-            if check_heading != None:
+            check_heading= (j.find("h2", class_="newsHdng"))           #''' it will check each page's each story' heading, untill it doen't exist in rdata(history)'''
+            if check_heading != None:                                   
                 chckHdng=check_heading.text.strip()
             
-            if rdata[index]["heading"]== chckHdng:
+            if rdata[index]["heading"]== chckHdng:                      # if any story's data exists in rdata then it will break the crowling there.
                 break
             else:
-                data1={}    
+                data1={}                                                 #else will crowl for the next story
                 
                 hdng=j.find("h2", class_="newsHdng")
                 if hdng != None:
@@ -148,14 +148,15 @@ def getNewStories():
              
 
 def LoadHistory():
-    file = os.path.exists("ndtv_news.json")
+    file = os.path.exists("ndtv_news.json")            #for the first execution when the json file is not exists,it will return false
     if file== False:
-        oldData= getNDTVstories()
+        oldData= getNDTVstories()                      #if file doesn't exists, it will call "getNDTVstories" ,which will return all 5 page's data
+                                                         #and take data from there in oldData variable
     else:
-        with open("ndtv_news.json",'r') as f:
+        with open("ndtv_news.json",'r') as f:       #if file exists then it will load that into same oldData variable.
             oldData = json.load(f)
 
-    return oldData
+    return oldData                             #finally will return old stories
 
 
 
@@ -164,7 +165,7 @@ def appendData():
     
     old_data=LoadHistory()
 
-    new_data= getNewStories()
+    new_data= getNewStories()                  
 
     j=1
     while j<=len(new_data):
